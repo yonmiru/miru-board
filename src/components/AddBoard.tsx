@@ -2,17 +2,21 @@ import { Button } from "@/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/ui/dialog"
-import { Input } from "@/ui/input"
 import { Label } from "@/ui/label"
 import { Plus } from "lucide-react"
+import "@blocknote/core/fonts/inter.css";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
+import { useCreateBlockNote } from "@blocknote/react";
 
 export function AddBoard() {
+  const editor = useCreateBlockNote({});
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -23,29 +27,13 @@ export function AddBoard() {
         </Button>
       </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[512px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription>
+          <DialogTitle className="text-4xl"> Add a greeting</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input id="name" value="Pedro Duarte" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input id="username" value="@peduarte" className="col-span-3" />
-          </div>
-        </div>
+        <BlockNoteView editor={editor} />;
         <DialogFooter>
-          <Button type="submit">Save changes</Button>
+          <Button type="submit">Post</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
