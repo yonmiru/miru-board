@@ -2,7 +2,7 @@
 
 Welcome to YonMiru's Birthday Board! This project is a birthday board application created to celebrate YonMiru's special day. Users can add greetings and messages to the board.
 
-![Logo](./logo.svg)
+![Logo](./public/logo.svg)
 
 ## Features
 
