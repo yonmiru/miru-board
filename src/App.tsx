@@ -1,9 +1,15 @@
-import BoardCard from "./components/BoardCard"
+import { ThemeProvider } from "@/components/ThemeProvider"
+import Header  from "@/components/Header"
+import { ModeToggle } from "@/components/ModeToggle"
+import { AddBoard } from "@/components/AddBoard";
+
 
 export default function App() {
- return (
-    <div>
-        <BoardCard />
-    </div>
-    )
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <Header />
+      <ModeToggle />
+      <AddBoard />
+    </ThemeProvider>
+  );
 }
