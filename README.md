@@ -1,8 +1,10 @@
+<p align="center">
+  <img src="./public/logo.svg" alt="Logo">
+</p>
+
 # YonMiru's Birthday Board
 
 Welcome to YonMiru's Birthday Board! This project is a birthday board application created to celebrate YonMiru's special day. Users can add greetings and messages to the board.
-
-![Logo](./public/logo.svg)
 
 ## Features
 
@@ -16,7 +18,7 @@ To get started with the project, follow these steps:
 
 1. Clone the repository:
   ```sh
-  git clone https://github.com/yourusername/miru-board.git
+  git clone https://github.com/yonmiru/miru-board.git
   ```
 2. Navigate to the project directory:
   ```sh
