@@ -15,7 +15,7 @@ export default function Header() {
         fontFamily: "Raleway",
         }}
       >
-        YonMiru's Birthday
+        YonMiru's Birthday Board
       </h1>
     </header>
   );
