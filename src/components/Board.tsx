@@ -2,6 +2,7 @@ import BoardCard from "@/components/BoardCard";
 import useBoard from "@/hooks/useBoard";
 import { useEffect } from "react";
 import { PuffLoader } from "react-spinners";
+import confetti from "canvas-confetti";
 
 interface BoardProps {
     refreshBoard: boolean;
@@ -27,6 +28,11 @@ export default function Board({ refreshBoard, setRefreshBoard }: BoardProps) {
             <div className="text-white text-2xl font-bold py-8">Loading...</div>
         </div>
     ) : (
+        confetti({
+            particleCount: 100,
+            spread: 300,
+            origin: { y: 0.6 },
+        }),
         <div className="mx-8 md:mx-32">
             <div className="columns-1 gap-5 lg:gap-8 lg:columns-2 xl:columns-3 py-10">
                 {board.map((item, index) => (
