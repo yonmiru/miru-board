@@ -122,3 +122,7 @@
     font-family: 'Lexend', sans-serif;
   }
 }
+
+::-webkit-scrollbar {
+  display: none;
+}
