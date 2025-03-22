@@ -84,6 +84,11 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
     if (!isGreetingsEmpty && !isNameEmpty) {
       postGreetings();
     }
+
+    setGreetings("");
+    setName("");
+    setImage("");
+    
   };
 
   const handlePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
