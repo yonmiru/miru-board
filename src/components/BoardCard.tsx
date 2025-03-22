@@ -1,58 +1,22 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/ui/card"
+import { Card, CardHeader, CardContent, CardFooter } from "@/ui/card"
 
-import { Input } from "@/ui/input"
-import { Label } from "@/ui/label"
-import { Button } from "@/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/select"
+type BoardCardProps = {
+  text: string
+  image: string
+  from: string
+}
 
-
-export default function BoardCard() {
+export default function BoardCard({ text, image, from }: BoardCardProps) {
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
+    <Card className="flex flex-col p-0 bg-transparent">
+      <CardHeader className="p-0">
+        <img src={image} alt={from} className="w-full h-full object-cover rounded-t-lg" />
       </CardHeader>
       <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name of your project" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Framework</Label>
-              <Select>
-                <SelectTrigger id="framework">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </form>
+        <p className="text-md">{text}</p>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Deploy</Button>
+      <CardFooter className="p-4">
+      <p className="text-sm text-gray-500">{from}</p>
       </CardFooter>
     </Card>
   )
