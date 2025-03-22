@@ -1,5 +1,5 @@
-import { Button } from "@/ui/button"
-import { useState } from "react"
+import { Button } from "@/ui/button";
+import { useState, useRef } from "react"; // Import useRef
 import {
   Dialog,
   DialogContent,
@@ -7,13 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/ui/dialog"
-import { Label } from "@/ui/label"
-import { Plus } from "lucide-react"
-import { Textarea } from "@/ui/textarea"
-import { Input } from "@/ui/input"
-import { apiUrl } from "@/lib/config"
-import { DialogClose } from "@radix-ui/react-dialog"
+} from "@/ui/dialog";
+import { Label } from "@/ui/label";
+import { Plus } from "lucide-react";
+import { Textarea } from "@/ui/textarea";
+import { Input } from "@/ui/input";
+import { apiUrl } from "@/lib/config";
+import { DialogClose } from "@/ui/dialog"; // Import DialogClose from shadcn
+import { Progress } from "@/ui/progress"; // Import the Progress component
 
 interface AddBoardProps {
   setShowAlert: (showAlert: boolean) => void;
@@ -21,12 +22,18 @@ interface AddBoardProps {
 }
 
 export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
-
   const [greetings, setGreetings] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [image, setImage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading
+  const [progress, setProgress] = useState<number>(0); // State for progress bar
+
+  const dialogCloseRef = useRef<HTMLButtonElement>(null); // Ref to control dialog close
 
   const postGreetings = async () => {
+    setIsLoading(true); // Start loading
+    setProgress(30); // Set initial progress
+
     try {
       const response = await fetch(`${apiUrl}/add-greeting`, {
         method: "POST",
@@ -45,21 +52,30 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
         throw new Error("Network response was not ok");
       }
 
+      setProgress(70); // Update progress after successful POST
+
+      // Refresh the board after successful submission
+      setRefreshBoard(true);
+      setShowAlert(true);
+
+      setProgress(100); // Complete progress
+
+      // Close the dialog after posting
+      if (dialogCloseRef.current) {
+        dialogCloseRef.current.click(); // Programmatically close the dialog
+      }
     } catch (error) {
       console.error("Failed to post greeting:", error);
     } finally {
-      setGreetings("");
-      setName("");
-      setImage("");
+      setIsLoading(false); // Stop loading
+      setProgress(0); // Reset progress
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     postGreetings();
-    setRefreshBoard(true);
-    setShowAlert(true);
-  }
+  };
 
   const handlePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,7 +119,9 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
     `,
               fontFamily: "Raleway",
             }}
-          > Add a greeting</DialogTitle>
+          >
+            Add a greeting
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col">
           <Label className="text-xl">Picture: </Label>
@@ -116,14 +134,30 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
             required
           />
           <Label className="text-xl">From: </Label>
-          <Input onChange={(e) => setName(e.target.value)} type="text" placeholder="Your name" className="max-w-[410px] lg:max-w-[460px] h-12 my-2" required />
+          <Input
+            onChange={(e) => setName(e.target.value)}
+            type="text"
+            placeholder="Your name"
+            className="max-w-[410px] lg:max-w-[460px] h-12 my-2"
+            required
+          />
+          {/* Progress Bar */}
+          {isLoading && (
+            <Progress value={progress} className="w-full my-4" />
+          )}
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="submit">Post</Button>
+              {/* Hidden button to programmatically close the dialog */}
+              <Button ref={dialogCloseRef} type="button" className="hidden">
+                Close
+              </Button>
             </DialogClose>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Posting..." : "Post"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
