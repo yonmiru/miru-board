@@ -9,29 +9,31 @@ import {
 } from "@/ui/dialog"
 import { Label } from "@/ui/label"
 import { Plus } from "lucide-react"
-import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
+import { Textarea } from "@/ui/textarea"
 
 export function AddBoard() {
-  const editor = useCreateBlockNote({});
 
   return (
     <Dialog>
       <DialogTrigger asChild>
       <div className="fixed bottom-10 right-10">
-        <Button variant="outline" size="lg">
-          <Plus className="h-6 w-6" />
-          <Label>Add Board</Label>
+        <Button variant="outline" className="w-48 h-16 lg:w-56 lg:h-20">
+          <Plus className="h-16 w-16 md:h-32 md:w-32" />
+          <Label className="text-xl md:text-2xl">Add Board</Label>
         </Button>
       </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[512px]">
+      <DialogContent className="w-100%">
         <DialogHeader>
           <DialogTitle className="text-4xl"> Add a greeting</DialogTitle>
         </DialogHeader>
-        <BlockNoteView editor={editor} />;
+        <div className="flex flex-col">
+        <Textarea
+          placeholder="What's on your mind?"
+          className="w-full h-40 my-4"
+          required
+        />
+        </div>
         <DialogFooter>
           <Button type="submit">Post</Button>
         </DialogFooter>
