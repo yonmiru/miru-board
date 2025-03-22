@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState   , useCallback } from "react";
 import { apiUrl } from "@/lib/config";
 
 interface Board {
@@ -8,38 +8,29 @@ interface Board {
     submitted_by: string;
 }
 
-const useBoard = (): { board: Board[], loading: boolean, error: string | null } => {
+const useBoard = (): { board: Board[], loading: boolean, error: string | null, fetchBoard: (callback?: () => void) => void } => {
     const [board, setBoard] = useState<Board[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        const fetchBoard = async () => {
-            try {
-                const response = await fetch(`${apiUrl}/get-greetings`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const contentType = response.headers.get("content-type");
-                if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error("Response is not valid JSON");
-                }
-        
-                const data: Board[] = await response.json();
-                setBoard(data);
-            } catch (error) {
-                setError(error instanceof Error ? error.message : "An error occurred");
-            } finally {
-                setLoading(false);
+    const fetchBoard = useCallback(async (callback?: () => void) => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${apiUrl}/get-greetings`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        };
+            const data: Board[] = await response.json();
+            setBoard(data);
+            if (callback) callback(); // Execute callback after successful fetch
+        } catch (error) {
+            setError(error instanceof Error ? error.message : "An error occurred");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-        fetchBoard();
-    }, [apiUrl]);
-
-    return { board, loading, error };
+    return { board, loading, error, fetchBoard };
 };
 
 export default useBoard;
