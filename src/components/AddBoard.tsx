@@ -1,5 +1,5 @@
 import { Button } from "@/ui/button";
-import { useState, useRef } from "react"; // Import useRef
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,9 @@ import { Plus } from "lucide-react";
 import { Textarea } from "@/ui/textarea";
 import { Input } from "@/ui/input";
 import { apiUrl } from "@/lib/config";
-import { DialogClose } from "@/ui/dialog"; // Import DialogClose from shadcn
-import { Progress } from "@/ui/progress"; // Import the Progress component
+import { DialogClose } from "@/ui/dialog";
+import { Progress } from "@/ui/progress";
+import logo from "@/assets/logo.svg";
 
 interface AddBoardProps {
   setShowAlert: (showAlert: boolean) => void;
@@ -25,20 +26,22 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
   const [greetings, setGreetings] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [image, setImage] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading
-  const [progress, setProgress] = useState<number>(0); // State for progress bar
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [greetingsError, setGreetingsError] = useState<boolean>(false);
+  const [nameError, setNameError] = useState<boolean>(false);
 
-  const dialogCloseRef = useRef<HTMLButtonElement>(null); // Ref to control dialog close
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
 
   const postGreetings = async () => {
-    setIsLoading(true); // Start loading
-    setProgress(30); // Set initial progress
+    setIsLoading(true);
+    setProgress(30);
 
     try {
       const response = await fetch(`${apiUrl}/add-greeting`, {
         method: "POST",
         body: JSON.stringify({
-          text: greetings,
+          text: greetings, // Preserve whitespace and newlines
           submitted_by: name,
           date_submitted: new Date().toISOString(),
           image: image,
@@ -52,29 +55,35 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
         throw new Error("Network response was not ok");
       }
 
-      setProgress(70); // Update progress after successful POST
-
-      // Refresh the board after successful submission
+      setProgress(70);
       setRefreshBoard(true);
       setShowAlert(true);
+      setProgress(100);
 
-      setProgress(100); // Complete progress
-
-      // Close the dialog after posting
       if (dialogCloseRef.current) {
-        dialogCloseRef.current.click(); // Programmatically close the dialog
+        dialogCloseRef.current.click();
       }
     } catch (error) {
       console.error("Failed to post greeting:", error);
     } finally {
-      setIsLoading(false); // Stop loading
-      setProgress(0); // Reset progress
+      setIsLoading(false);
+      setProgress(0);
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    postGreetings();
+
+    // Trim only for validation, but preserve whitespace in the actual data
+    const isGreetingsEmpty = greetings.trim() === "";
+    const isNameEmpty = name.trim() === "";
+
+    setGreetingsError(isGreetingsEmpty);
+    setNameError(isNameEmpty);
+
+    if (!isGreetingsEmpty && !isNameEmpty) {
+      postGreetings();
+    }
   };
 
   const handlePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,16 +91,15 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.readAsArrayBuffer(file); // Read as binary
+    reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
       const blob = new Blob([reader.result as ArrayBuffer], { type: file.type });
 
-      // Convert blob to Base64
       const base64Reader = new FileReader();
       base64Reader.readAsDataURL(blob);
       base64Reader.onloadend = () => {
         const base64String = base64Reader.result as string;
-        setImage(base64String); // Store base64 to display in UI
+        setImage(base64String);
       };
     };
   };
@@ -100,17 +108,20 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
     <Dialog>
       <DialogTrigger asChild>
         <div className="fixed bottom-10 right-10">
-          <Button variant="outline" className="w-48 h-16 lg:w-56 lg:h-20">
-            <Plus className="h-16 w-16 md:h-32 md:w-32" />
-            <Label className="text-xl md:text-2xl">Add Board</Label>
-          </Button>
+            <div className="relative flex flex-col items-center">
+            <img src={logo} alt="Logo" className="-z-10 w-48 h-48 absolute bottom-5 lg:bottom-10" />
+            <Button variant="secondary" className="w-48 h-16 lg:w-56 lg:h-20 mt-10">
+              <Plus className="h-16 w-16 md:h-32 md:w-32" />
+              <Label className="text-xl md:text-2xl">Add Board</Label>
+            </Button>
+            </div>
         </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-4xl lg:text-5xl font-black font-raleway tracking-[1px] text-transparent"
             style={{
-              WebkitTextStroke: "2px #3B82F6", // Blue stroke
+              WebkitTextStroke: "2px #3B82F6",
               filter: `
       drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5))
       drop-shadow(0px 0px 4px rgba(59, 130, 246, 0.5))
@@ -126,28 +137,29 @@ export function AddBoard({ setShowAlert, setRefreshBoard }: AddBoardProps) {
         <form onSubmit={handleSubmit} className="flex flex-col">
           <Label className="text-xl">Picture: </Label>
           <Input id="picture" type="file" className="my-2" onChange={handlePicture} />
+          
           <Label className="text-xl">Greeting: </Label>
           <Textarea
             placeholder="Write your greeting here"
             onChange={(e) => setGreetings(e.target.value)}
             className="max-w-[410px] lg:max-w-[460px] h-40 my-2 overflow-y-scroll"
-            required
           />
+          {greetingsError && <Label className="text-red-500 my-2 ">Greeting is required</Label>}
+          
           <Label className="text-xl">From: </Label>
           <Input
             onChange={(e) => setName(e.target.value)}
             type="text"
             placeholder="Your name"
             className="max-w-[410px] lg:max-w-[460px] h-12 my-2"
-            required
           />
-          {/* Progress Bar */}
+          {nameError && <Label className="text-red-500 my-2">Name is required but its up to you if you want to troll</Label>}
+          
           {isLoading && (
             <Progress value={progress} className="w-full my-4" />
           )}
           <DialogFooter>
             <DialogClose asChild>
-              {/* Hidden button to programmatically close the dialog */}
               <Button ref={dialogCloseRef} type="button" className="hidden">
                 Close
               </Button>
